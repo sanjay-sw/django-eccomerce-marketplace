@@ -21,7 +21,7 @@ class Product(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
-    image_icon = models.ImageField(upload_to="/products", blank=True, null=True)
+    image_icon = models.ImageField(upload_to="products", blank=True, null=True)
 
     def __str__(self):
         return self.category_name
