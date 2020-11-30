@@ -22,9 +22,21 @@ class Product(models.Model):
         return self.name
 
 
+class ProductImages(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_image = models.ImageField(upload_to="product_images", blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Product Image'
+        verbose_name_plural = 'Product Images'
+
+    def __str__(self):
+        return self.product.name
+
+
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
-    image_icon = models.ImageField(upload_to="product_images", blank=True, null=True)
+    image_icon = models.ImageField(upload_to="category_images", blank=True, null=True)
 
     class Meta:
         verbose_name = 'Category'
