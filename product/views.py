@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import Product, ProductImages, Category
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
+
 
 
 def productlist(request, category_slug=None):
@@ -13,7 +14,17 @@ def productlist(request, category_slug=None):
         category = Category.objects.get(slug=category_slug)
         all_products = all_products.filter(category=category)
 
-    paginator = Paginator(all_products, 2)
+    search_query = request.GET.get('q')
+    if search_query:
+        all_products = all_products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(condition__icontains=search_query) |
+            Q(brand__brand_name__icontains=search_query) |
+            Q(category__category_name__icontains=search_query)
+        )
+
+    paginator = Paginator(all_products, 5)
     page = request.GET.get('page')
     all_products = paginator.get_page(page)
     template = 'Product/product_list.html'
