@@ -14,12 +14,11 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
     condition = models.CharField(max_length=100, choices=CONDITION_TYPE)
-    price = models.DecimalField(max_digits=10, decimal_places=5)
+    price = models.IntegerField(default=0)
     created = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to="main_products", blank=True, null=True)
-
 
     slug = models.SlugField(blank=True, null=True)
 
@@ -47,6 +46,13 @@ class ProductImages(models.Model):
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
     image_icon = models.ImageField(upload_to="category_images", blank=True, null=True)
+
+    slug = models.SlugField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.category_name:
+            self.slug = slugify(self.category_name)
+        super(Category, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Category'

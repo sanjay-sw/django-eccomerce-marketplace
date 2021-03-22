@@ -1,17 +1,24 @@
 from django.shortcuts import render
-from .models import Product, ProductImages
+from .models import Product, ProductImages, Category
 from django.core.paginator import Paginator
+from django.db.models import Count
 
 
-def productlist(request):
-    all_products = Product.objects.all()
-    template = 'Product/product_list.html'
+def productlist(request, category_slug=None):
+    category = None
+    all_products = Product.objects.all().order_by('id')
+    categorylist = Category.objects.annotate(total_count=Count('product'))
+
+    if category_slug:
+        category = Category.objects.get(slug=category_slug)
+        all_products = all_products.filter(category=category)
 
     paginator = Paginator(all_products, 2)
     page = request.GET.get('page')
     all_products = paginator.get_page(page)
+    template = 'Product/product_list.html'
+    context = {'product_list': all_products, 'category_list': categorylist, 'category': category}
 
-    context = {'product_list': all_products}
     return render(request, template, context)
 
 
